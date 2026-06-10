@@ -37,6 +37,11 @@
         font-size: 1rem;
         letter-spacing: 0.06em;
       }
+      .clock {
+        margin-top: 0.5rem;
+        font-size: 0.95rem;
+        color: #c8f2b8;
+      }
       main {
         flex: 1;
         display: flex;
@@ -101,8 +106,13 @@
   <body>
     <div class="page-shell">
       <header>
-        <p class="site-title">土壤濕度敢測自動澆水系統</p>
-        <p class="owner-name">廖烽均</p>
+        <div>
+          <p class="site-title">土壤濕度敢測自動澆水系統</p>
+        </div>
+        <div>
+          <p class="owner-name">廖烽均</p>
+          <p class="clock" id="current-time">00:00:00</p>
+        </div>
       </header>
       <main>
         <section class="card">
@@ -116,5 +126,20 @@
         </section>
       </main>
     </div>
+    <script>
+      function updateCurrentTime() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, "0");
+        const minutes = String(now.getMinutes()).padStart(2, "0");
+        const seconds = String(now.getSeconds()).padStart(2, "0");
+        const timeString = `${hours}:${minutes}:${seconds}`;
+        const clockElement = document.getElementById("current-time");
+        if (clockElement) {
+          clockElement.textContent = timeString;
+        }
+      }
+      updateCurrentTime();
+      setInterval(updateCurrentTime, 1000);
+    </script>
   </body>
 </html>
