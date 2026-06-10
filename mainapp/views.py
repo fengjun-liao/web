@@ -1,12 +1,17 @@
+import random
+
 from django.shortcuts import render
 
 
 def index(request):
-    """Render the test website home page."""
+    """Render the personal website home page."""
+    soil_moisture = random.randint(28, 73)
     context = {
-        "title": "Test Website",
-        "heading": "Welcome to the Test Website",
-        "message": "This is a simple Django test website created for demonstration.",
+        "title": "土壤濕度敢測自動澆水系統",
+        "heading": "土壤濕度敢測自動澆水系統",
+        "message": "即時顯示土壤濕度，幫助您自動澆水，保持植物健康。",
+        "soil_moisture": soil_moisture,
+        "name": "廖烽均",
     }
     return render(request, "mainapp/index.html", context)
 

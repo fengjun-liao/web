@@ -1,52 +1,120 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{{ title }}</title>
     <style>
       body {
-        font-family: Arial, sans-serif;
         margin: 0;
         padding: 0;
-        background-color: #f6f8fa;
-        color: #222;
+        min-height: 100vh;
+        font-family: "Noto Sans TC", Arial, sans-serif;
+        background: linear-gradient(rgba(10, 25, 12, 0.55), rgba(10, 25, 12, 0.55)),
+          url("https://images.unsplash.com/photo-1518977956813-8a5865b3b519?auto=format&fit=crop&w=1500&q=80") center/cover no-repeat;
+        color: #f4f7f1;
+      }
+      .page-shell {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
       }
       header {
-        background: #007acc;
-        color: white;
-        padding: 1.5rem;
-        text-align: center;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.25rem 2rem;
+        background: rgba(8, 45, 20, 0.7);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      }
+      .site-title {
+        font-size: 1.15rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin: 0;
+      }
+      .owner-name {
+        font-size: 1rem;
+        letter-spacing: 0.06em;
       }
       main {
-        max-width: 720px;
-        margin: 2rem auto;
-        padding: 1rem;
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 2rem;
       }
-      a {
-        color: #007acc;
-        text-decoration: none;
+      .card {
+        width: 100%;
+        max-width: 840px;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 24px;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25);
+        backdrop-filter: blur(14px);
+        padding: 2rem;
       }
-      a:hover {
-        text-decoration: underline;
+      .card h1 {
+        margin: 0 0 1rem;
+        font-size: 2rem;
+      }
+      .card p {
+        margin: 0 0 1rem;
+        line-height: 1.8;
+        max-width: 40rem;
+      }
+      .moisture {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 1rem;
+        padding: 1.5rem 2rem;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.18);
+        font-size: 2rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+      }
+      .moisture span {
+        margin-left: 0.75rem;
+        font-size: 1.1rem;
+        font-weight: 400;
+      }
+      .note {
+        color: #d6f7c7;
+        font-size: 0.98rem;
+      }
+      @media (max-width: 720px) {
+        header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .card {
+          padding: 1.5rem;
+        }
+        .card h1 {
+          font-size: 1.75rem;
+        }
       }
     </style>
   </head>
   <body>
-    <header>
-      <h1>{{ heading }}</h1>
-    </header>
-    <main>
-      <p>{{ message }}</p>
-      <p>
-        This test website includes a home page and a simple about page.
-      </p>
-      <p>
-        <a href="{% url 'about' %}">About this site</a>
-      </p>
-    </main>
+    <div class="page-shell">
+      <header>
+        <p class="site-title">土壤濕度敢測自動澆水系統</p>
+        <p class="owner-name">廖烽均</p>
+      </header>
+      <main>
+        <section class="card">
+          <h1>自動澆水系統狀態</h1>
+          <p>{{ message }}</p>
+          <div class="moisture">
+            {{ soil_moisture }}%
+            <span>土壤濕度</span>
+          </div>
+          <p class="note">此數值為系統即時讀取的土壤濕度，當濕度過低時可啟動自動澆水。</p>
+        </section>
+      </main>
+    </div>
   </body>
 </html>
