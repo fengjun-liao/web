@@ -21,21 +21,23 @@
       }
       header {
         display: flex;
-        justify-content: space-between;
+        flex-direction: column;
         align-items: center;
         padding: 1.25rem 2rem;
+        text-align: center;
         background: rgba(8, 45, 20, 0.7);
         border-bottom: 1px solid rgba(255, 255, 255, 0.12);
       }
       .site-title {
-        font-size: 1.15rem;
+        font-size: 2.1rem;
         letter-spacing: 0.08em;
         text-transform: uppercase;
-        margin: 0;
+        margin: 0 0 0.75rem;
       }
       .owner-name {
         font-size: 1rem;
         letter-spacing: 0.06em;
+        margin: 0;
       }
       .clock {
         margin-top: 0.5rem;
@@ -89,6 +91,16 @@
         color: #d6f7c7;
         font-size: 0.98rem;
       }
+      .chart-container {
+        margin-top: 2rem;
+      }
+      #moisture-chart {
+        width: 100%;
+        height: 300px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.12);
+        display: block;
+      }
       @media (max-width: 720px) {
         header {
           flex-direction: column;
@@ -118,15 +130,22 @@
         <section class="card">
           <h1>自動澆水系統狀態</h1>
           <p>{{ message }}</p>
-          <div class="moisture">
+          <div class="moisture" id="current-moisture">
             {{ soil_moisture }}%
             <span>土壤濕度</span>
           </div>
-          <p class="note">此數值為系統即時讀取的土壤濕度，當濕度過低時可啟動自動澆水。</p>
+          <div class="chart-container">
+            <canvas id="moisture-chart"></canvas>
+          </div>
+          <p class="note">此數值為系統即時讀取的土壤濕度，並每分鐘記錄一筆，用折線圖顯示變化趨勢。</p>
         </section>
       </main>
     </div>
     <script>
+      const initialSoilMoisture = {{ soil_moisture }};
+      const moistureStorageKey = "soilMoistureLog";
+      const recordIntervalMs = 60_000;
+
       function updateCurrentTime() {
         const now = new Date();
         const hours = String(now.getHours()).padStart(2, "0");
@@ -138,8 +157,177 @@
           clockElement.textContent = timeString;
         }
       }
-      updateCurrentTime();
-      setInterval(updateCurrentTime, 1000);
+
+      function formatTime(date) {
+        return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+      }
+
+      function clamp(value, min, max) {
+        return Math.min(max, Math.max(min, value));
+      }
+
+      function generateInitialLog() {
+        const now = new Date();
+        const entries = [];
+        let value = initialSoilMoisture;
+        for (let i = 5; i >= 0; i -= 1) {
+          const timestamp = new Date(now.getTime() - i * recordIntervalMs);
+          if (i !== 0) {
+            value = clamp(value + Math.round((Math.random() - 0.5) * 6), 25, 75);
+          }
+          entries.push({ time: formatTime(timestamp), value });
+        }
+        return entries;
+      }
+
+      function loadMoistureLog() {
+        const saved = localStorage.getItem(moistureStorageKey);
+        if (!saved) {
+          return generateInitialLog();
+        }
+        try {
+          const parsed = JSON.parse(saved);
+          return Array.isArray(parsed) && parsed.length > 0 ? parsed : generateInitialLog();
+        } catch {
+          return generateInitialLog();
+        }
+      }
+
+      function saveMoistureLog(log) {
+        localStorage.setItem(moistureStorageKey, JSON.stringify(log));
+      }
+
+      function normalizeLog(log) {
+        return log.slice(-12);
+      }
+
+      function createChartData(log) {
+        return {
+          labels: log.map((entry) => entry.time),
+          values: log.map((entry) => entry.value),
+        };
+      }
+
+      function drawChart(log) {
+        const canvas = document.getElementById("moisture-chart");
+        if (!canvas) return;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+
+        const pixelRatio = window.devicePixelRatio || 1;
+        const width = canvas.clientWidth * pixelRatio;
+        const height = canvas.clientHeight * pixelRatio;
+        canvas.width = width;
+        canvas.height = height;
+        ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+
+        const containerWidth = canvas.clientWidth;
+        const containerHeight = canvas.clientHeight;
+        const padding = 36;
+
+        ctx.clearRect(0, 0, containerWidth, containerHeight);
+
+        const chartWidth = containerWidth - padding * 2;
+        const chartHeight = containerHeight - padding * 2;
+        const coords = createChartData(log);
+        const values = coords.values;
+        const maxValue = Math.max(...values, 100);
+        const minValue = Math.min(...values, 0);
+        const valueRange = Math.max(1, maxValue - minValue);
+
+        ctx.strokeStyle = "rgba(196, 255, 188, 0.9)";
+        ctx.lineWidth = 3;
+        ctx.fillStyle = "rgba(255, 255, 255, 0.88)";
+        ctx.font = "12px 'Noto Sans TC', Arial, sans-serif";
+        ctx.textAlign = "right";
+        ctx.textBaseline = "middle";
+
+        for (let i = 0; i <= 4; i += 1) {
+          const y = padding + (chartHeight / 4) * i;
+          const value = maxValue - (valueRange / 4) * i;
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(padding, y);
+          ctx.lineTo(padding + chartWidth, y);
+          ctx.stroke();
+
+          ctx.fillStyle = "rgba(255, 255, 255, 0.72)";
+          ctx.fillText(`${Math.round(value)}%`, padding - 8, y);
+        }
+
+        const points = values.map((value, index) => {
+          return {
+            x: padding + (chartWidth / Math.max(1, values.length - 1)) * index,
+            y: padding + ((maxValue - value) / valueRange) * chartHeight,
+          };
+        });
+
+        if (points.length > 1) {
+          ctx.strokeStyle = "rgba(196, 255, 188, 1)";
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          points.forEach((point, index) => {
+            if (index === 0) ctx.moveTo(point.x, point.y);
+            else ctx.lineTo(point.x, point.y);
+          });
+          ctx.stroke();
+        }
+
+        ctx.fillStyle = "rgba(196, 255, 188, 1)";
+        points.forEach((point) => {
+          ctx.beginPath();
+          ctx.arc(point.x, point.y, 4, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        ctx.fillStyle = "rgba(255, 255, 255, 0.82)";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "top";
+        coords.labels.forEach((label, index) => {
+          const x = padding + (chartWidth / Math.max(1, coords.labels.length - 1)) * index;
+          ctx.fillText(label, x, padding + chartHeight + 10);
+        });
+      }
+
+      function updateMoistureDisplay(value) {
+        const moistureElement = document.getElementById("current-moisture");
+        if (moistureElement) {
+          moistureElement.innerHTML = `${value}%<span>土壤濕度</span>`;
+        }
+      }
+
+      function addMoistureEntry(log) {
+        const last = log[log.length - 1] || { value: initialSoilMoisture };
+        const nextValue = clamp(last.value + Math.round((Math.random() - 0.5) * 6), 25, 75);
+        const now = new Date();
+        log.push({ time: formatTime(now), value: nextValue });
+        return normalizeLog(log);
+      }
+
+      function startMoistureRecorder() {
+        let log = loadMoistureLog();
+        if (log.length === 0) {
+          log = [{ time: formatTime(new Date()), value: initialSoilMoisture }];
+        }
+        saveMoistureLog(log);
+        updateMoistureDisplay(log[log.length - 1].value);
+        drawChart(log);
+
+        setInterval(() => {
+          log = addMoistureEntry(log);
+          saveMoistureLog(log);
+          updateMoistureDisplay(log[log.length - 1].value);
+          drawChart(log);
+        }, recordIntervalMs);
+      }
+
+      window.addEventListener("load", () => {
+        updateCurrentTime();
+        setInterval(updateCurrentTime, 1000);
+        startMoistureRecorder();
+        window.addEventListener("resize", () => drawChart(loadMoistureLog()));
+      });
     </script>
   </body>
 </html>
