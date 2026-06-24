@@ -74,11 +74,16 @@ WSGI_APPLICATION = "mysite.wsgi.application"
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'smart_pot_db',         # 你們大專案的資料庫名稱
+        'USER': 'group5_admin',                 # MySQL 帳號
+        'PASSWORD': 'admin_password_555',     # 你們設定的 MySQL 密碼
+        'HOST': 'db',        # 🌟 這裡必須填你們 MySQL 在 docker-compose 裡的 service 名稱！
+        'PORT': '3306',
     }
 }
+
 
 
 # Password validation
