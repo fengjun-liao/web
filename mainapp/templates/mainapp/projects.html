@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>組專題</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: "Noto Sans TC", Arial, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+        
+        .page-shell {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 1.5rem 2rem;
+            text-align: center;
+            border-bottom: 2px solid #4CAF50;
+        }
+        
+        .site-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .owner-info {
+            font-size: 1rem;
+            margin-bottom: 0.3rem;
+        }
+        
+        .student-id {
+            font-size: 0.9rem;
+            color: #4CAF50;
+        }
+        
+        nav {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 0.5rem 2rem;
+            border-bottom: 1px solid #333;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-right: 2rem;
+            padding: 0.5rem 1rem;
+            display: inline-block;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        
+        nav a:hover {
+            background: #4CAF50;
+        }
+        
+        main {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: white;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 0.5rem;
+        }
+        
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .project-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .project-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 0.5rem;
+        }
+        
+        .project-description {
+            color: #666;
+            margin-bottom: 1rem;
+            flex-grow: 1;
+        }
+        
+        .project-link-button {
+            display: inline-block;
+            padding: 0.7rem 1.5rem;
+            background: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            text-align: center;
+            transition: background 0.3s;
+            font-weight: bold;
+        }
+        
+        .project-link-button:hover {
+            background: #45a049;
+        }
+        
+        .no-data {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            text-align: center;
+            color: #666;
+        }
+        
+        .admin-section {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            color: white;
+        }
+        
+        .admin-link {
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .admin-link:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            main {
+                padding: 1rem;
+            }
+            
+            .project-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-shell">
+        <header>
+            <div class="site-title">組專題</div>
+            <div class="owner-info">名字: {{ name }}</div>
+            <div class="student-id">座號: {{ student_id }}</div>
+        </header>
+        
+        <nav>
+            <a href="{% url 'index' %}">首頁</a>
+            <a href="{% url 'dashboard' %}">感測器儀表板</a>
+            <a href="{% url 'raw_data' %}">原始數據</a>
+            <a href="{% url 'projects' %}">組專題</a>
+            <a href="{% url 'about' %}">關於</a>
+        </nav>
+        
+        <main>
+            <h2 class="section-title">我的組專題</h2>
+            
+            {% if project_links %}
+                <div class="project-grid">
+                    {% for project in project_links %}
+                        <div class="project-card">
+                            <div class="project-title">{{ project.title }}</div>
+                            {% if project.description %}
+                                <div class="project-description">{{ project.description }}</div>
+                            {% else %}
+                                <div class="project-description">點擊下方按鈕瀏覽專題詳情。</div>
+                            {% endif %}
+                            <a href="{{ project.url }}" target="_blank" class="project-link-button">
+                                前往專題 →
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="no-data">
+                    <p>目前沒有配置任何組專題連結。</p>
+                    <p>請在管理後台添加專題連結。</p>
+                </div>
+            {% endif %}
+            
+            <div class="admin-section">
+                <p>⚙️ 想要添加或編輯組專題連結？請訪問 <a href="{% url 'admin:mainapp_projectlink_changelist' %}" class="admin-link">管理後台</a></p>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

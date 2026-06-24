@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>感測器儀表板</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: "Noto Sans TC", Arial, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+        
+        .page-shell {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 1.5rem 2rem;
+            text-align: center;
+            border-bottom: 2px solid #4CAF50;
+        }
+        
+        .site-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .owner-info {
+            font-size: 1rem;
+            margin-bottom: 0.3rem;
+        }
+        
+        .student-id {
+            font-size: 0.9rem;
+            color: #4CAF50;
+        }
+        
+        nav {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 0.5rem 2rem;
+            border-bottom: 1px solid #333;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-right: 2rem;
+            padding: 0.5rem 1rem;
+            display: inline-block;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        
+        nav a:hover {
+            background: #4CAF50;
+        }
+        
+        main {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: white;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 0.5rem;
+        }
+        
+        .sensor-table {
+            width: 100%;
+            background: white;
+            border-collapse: collapse;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sensor-table thead {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .sensor-table th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        .sensor-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .sensor-table tbody tr:hover {
+            background: #f5f5f5;
+        }
+        
+        .value-cell {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        
+        .action-links a {
+            padding: 0.4rem 0.8rem;
+            background: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-right: 0.5rem;
+            display: inline-block;
+            transition: background 0.3s;
+        }
+        
+        .action-links a:hover {
+            background: #45a049;
+        }
+        
+        .no-data {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            text-align: center;
+            color: #666;
+        }
+        
+        @media (max-width: 768px) {
+            .sensor-table {
+                font-size: 0.9rem;
+            }
+            
+            .sensor-table th,
+            .sensor-table td {
+                padding: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-shell">
+        <header>
+            <div class="site-title">感測器儀表板</div>
+            <div class="owner-info">名字: {{ name }}</div>
+            <div class="student-id">座號: {{ student_id }}</div>
+        </header>
+        
+        <nav>
+            <a href="{% url 'index' %}">首頁</a>
+            <a href="{% url 'dashboard' %}">感測器儀表板</a>
+            <a href="{% url 'raw_data' %}">原始數據</a>
+            <a href="{% url 'projects' %}">組專題</a>
+            <a href="{% url 'about' %}">關於</a>
+        </nav>
+        
+        <main>
+            <h2 class="section-title">所有感測器</h2>
+            
+            {% if sensors %}
+                <table class="sensor-table">
+                    <thead>
+                        <tr>
+                            <th>感測器名稱</th>
+                            <th>MQTT主題</th>
+                            <th>最新值</th>
+                            <th>單位</th>
+                            <th>記錄數</th>
+                            <th>動作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sensor in sensors %}
+                            <tr>
+                                <td>{{ sensor.name }}</td>
+                                <td><code style="font-size: 0.85rem;">{{ sensor.mqtt_topic }}</code></td>
+                                <td class="value-cell">{{ sensor.latest_value|floatformat:2 }}</td>
+                                <td>{{ sensor.unit }}</td>
+                                <td>{{ sensor.total_readings }}</td>
+                                <td class="action-links">
+                                    <a href="{% url 'sensor_detail' sensor.id %}">查看圖表</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="no-data">
+                    <p>目前沒有配置任何感測器。</p>
+                </div>
+            {% endif %}
+        </main>
+    </div>
+</body>
+</html>

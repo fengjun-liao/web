@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ sensor.name }} - 詳細資訊</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: "Noto Sans TC", Arial, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+        
+        .page-shell {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 1.5rem 2rem;
+            text-align: center;
+            border-bottom: 2px solid #4CAF50;
+        }
+        
+        .site-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .owner-info {
+            font-size: 1rem;
+            margin-bottom: 0.3rem;
+        }
+        
+        .student-id {
+            font-size: 0.9rem;
+            color: #4CAF50;
+        }
+        
+        nav {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 0.5rem 2rem;
+            border-bottom: 1px solid #333;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-right: 2rem;
+            padding: 0.5rem 1rem;
+            display: inline-block;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        
+        nav a:hover {
+            background: #4CAF50;
+        }
+        
+        main {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: white;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 0.5rem;
+        }
+        
+        .controls {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .control-group {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .control-group label {
+            font-weight: bold;
+        }
+        
+        .control-group select,
+        .control-group button {
+            padding: 0.6rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .control-group button {
+            background: #4CAF50;
+            color: white;
+            cursor: pointer;
+            border: none;
+            transition: background 0.3s;
+        }
+        
+        .control-group button:hover {
+            background: #45a049;
+        }
+        
+        .sensor-info {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .info-card {
+            padding: 1rem;
+            background: #f5f5f5;
+            border-radius: 4px;
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+        
+        .info-value {
+            font-size: 1.3rem;
+            color: #333;
+        }
+        
+        .chart-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            height: 400px;
+        }
+        
+        .chart-container canvas {
+            max-height: 350px;
+        }
+        
+        .data-table {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .data-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table thead {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .data-table th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        .data-table td {
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .data-table tbody tr:hover {
+            background: #f5f5f5;
+        }
+        
+        .value-cell {
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        
+        .no-data {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            text-align: center;
+            color: #666;
+        }
+        
+        @media (max-width: 768px) {
+            main {
+                padding: 1rem;
+            }
+            
+            .control-group {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-shell">
+        <header>
+            <div class="site-title">{{ sensor.name }} - 詳細資訊</div>
+            <div class="owner-info">名字: {{ name }}</div>
+            <div class="student-id">座號: {{ student_id }}</div>
+        </header>
+        
+        <nav>
+            <a href="{% url 'index' %}">首頁</a>
+            <a href="{% url 'dashboard' %}">感測器儀表板</a>
+            <a href="{% url 'raw_data' %}">原始數據</a>
+            <a href="{% url 'projects' %}">組專題</a>
+            <a href="{% url 'about' %}">關於</a>
+        </nav>
+        
+        <main>
+            {% if error %}
+                <div class="no-data" style="background: #ffcdd2; color: #c62828;">
+                    <p>錯誤: {{ error }}</p>
+                </div>
+            {% else %}
+                <div class="controls">
+                    <div class="control-group">
+                        <label>顯示最近</label>
+                        <form method="get" style="display: flex; gap: 0.5rem;">
+                            <select name="days" onchange="this.form.submit()">
+                                <option value="1" {% if days == 1 %}selected{% endif %}>1 天</option>
+                                <option value="7" {% if days == 7 %}selected{% endif %}>7 天</option>
+                                <option value="30" {% if days == 30 %}selected{% endif %}>30 天</option>
+                            </select>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="sensor-info">
+                    <div class="info-card">
+                        <div class="info-label">感測器名稱</div>
+                        <div class="info-value">{{ sensor.name }}</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">MQTT主題</div>
+                        <div class="info-value" style="font-size: 0.9rem; word-break: break-all;">{{ sensor.mqtt_topic }}</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">單位</div>
+                        <div class="info-value">{{ sensor.unit|default:"N/A" }}</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">記錄數</div>
+                        <div class="info-value">{{ readings_count }}</div>
+                    </div>
+                </div>
+                
+                {% if readings %}
+                    <h2 class="section-title">歷史數據圖表</h2>
+                    <div class="chart-container">
+                        <canvas id="sensor-chart"></canvas>
+                    </div>
+                    
+                    <h2 class="section-title">最近資料</h2>
+                    <div class="data-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>時間</th>
+                                    <th>數值</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for reading in readings|slice:":20" reversed %}
+                                    <tr>
+                                        <td>{{ reading.timestamp|date:"Y-m-d H:i:s" }}</td>
+                                        <td class="value-cell">{{ reading.value|floatformat:2 }} {{ sensor.unit }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="no-data">
+                        <p>此感測器目前沒有資料。</p>
+                    </div>
+                {% endif %}
+            {% endif %}
+        </main>
+    </div>
+    
+    <script>
+        const chartCanvas = document.getElementById('sensor-chart');
+        if (chartCanvas) {
+            fetch(`{% url 'sensor_data_api' sensor.id %}?days={{ days }}`)
+                .then(response => response.json())
+                .then(data => {
+                    new Chart(chartCanvas, {
+                        type: 'line',
+                        data: {
+                            labels: data.timestamps.map(ts => new Date(ts).toLocaleString('zh-TW')),
+                            datasets: [{
+                                label: '{{ sensor.name }} ({{ sensor.unit }})',
+                                data: data.values,
+                                borderColor: '#4CAF50',
+                                backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                                tension: 0.3,
+                                fill: true,
+                                pointRadius: 3,
+                                pointBackgroundColor: '#4CAF50',
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    labels: {
+                                        font: {
+                                            size: 12
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: false,
+                                    ticks: {
+                                        font: {
+                                            size: 10
+                                        }
+                                    }
+                                },
+                                x: {
+                                    ticks: {
+                                        font: {
+                                            size: 10
+                                        },
+                                        maxRotation: 45,
+                                        minRotation: 0
+                                    }
+                                }
+                            }
+                        }
+                    });
+                })
+                .catch(error => console.error('Error loading chart:', error));
+        }
+    </script>
+</body>
+</html>

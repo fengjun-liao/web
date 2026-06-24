@@ -1,103 +1,267 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{{ title }}</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-      body {
-        margin: 0;
-        padding: 0;
-        min-height: 100vh;
-        font-family: "Noto Sans TC", Arial, sans-serif;
-        background: linear-gradient(rgba(10, 25, 12, 0.55), rgba(10, 25, 12, 0.55)),
-          url("https://img.pikbest.com/wp/202408/garden-plant-sedum-a-beautiful-backdrop-for-gardening-inspiration_9909003.jpg!w700wp") center/cover no-repeat;
-        color: #f4f7f1;
-      }
-      .page-shell {
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-      }
-      header {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 1.25rem 2rem;
-        text-align: center;
-        background: rgba(8, 45, 20, 0.7);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-      }
-      .site-title {
-        font-size: 2.1rem;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        margin: 0 0 0.75rem;
-      }
-      .owner-name {
-        font-size: 1rem;
-        letter-spacing: 0.06em;
-        margin: 0;
-      }
-      .clock {
-        margin-top: 0.5rem;
-        font-size: 0.95rem;
-        color: #c8f2b8;
-      }
-      main {
-        flex: 1;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 2rem;
-      }
-      .card {
-        width: 100%;
-        max-width: 840px;
-        background: rgba(255, 255, 255, 0.12);
-        border: 1px solid rgba(255, 255, 255, 0.18);
-        border-radius: 24px;
-        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25);
-        backdrop-filter: blur(14px);
-        padding: 2rem;
-      }
-      .card h1 {
-        margin: 0 0 1rem;
-        font-size: 2rem;
-      }
-      .card p {
-        margin: 0 0 1rem;
-        line-height: 1.8;
-        max-width: 40rem;
-      }
-      .moisture {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        margin-top: 1rem;
-        padding: 1.5rem 2rem;
-        border-radius: 18px;
-        background: rgba(255, 255, 255, 0.18);
-        font-size: 2rem;
-        font-weight: 700;
-        letter-spacing: 0.05em;
-      }
-      .moisture span {
-        margin-left: 0.75rem;
-        font-size: 1.1rem;
-        font-weight: 400;
-      }
-      .note {
-        color: #d6f7c7;
-        font-size: 0.98rem;
-      }
-      .chart-container {
-        margin-top: 2rem;
-      }
-      #moisture-chart {
-        width: 100%;
-        height: 300px;
-        border-radius: 18px;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: "Noto Sans TC", Arial, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+        
+        .page-shell {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 1.5rem 2rem;
+            text-align: center;
+            border-bottom: 2px solid #4CAF50;
+        }
+        
+        .site-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .owner-info {
+            font-size: 1rem;
+            margin-bottom: 0.3rem;
+        }
+        
+        .student-id {
+            font-size: 0.9rem;
+            color: #4CAF50;
+        }
+        
+        nav {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 0.5rem 2rem;
+            border-bottom: 1px solid #333;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-right: 2rem;
+            padding: 0.5rem 1rem;
+            display: inline-block;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        
+        nav a:hover {
+            background: #4CAF50;
+        }
+        
+        main {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: white;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 0.5rem;
+        }
+        
+        .sensor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .sensor-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .sensor-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .sensor-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .sensor-value {
+            font-size: 2rem;
+            color: #4CAF50;
+            font-weight: bold;
+            margin: 1rem 0;
+        }
+        
+        .sensor-unit {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .sensor-topic {
+            font-size: 0.85rem;
+            color: #999;
+            margin-top: 0.5rem;
+            font-family: monospace;
+            word-break: break-all;
+        }
+        
+        .sensor-timestamp {
+            font-size: 0.85rem;
+            color: #999;
+            margin-top: 0.5rem;
+        }
+        
+        .view-button {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        
+        .view-button:hover {
+            background: #45a049;
+        }
+        
+        .projects-section {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .project-link {
+            display: block;
+            margin: 0.8rem 0;
+            padding: 1rem;
+            background: #f5f5f5;
+            border-left: 4px solid #4CAF50;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #333;
+            transition: background 0.3s;
+        }
+        
+        .project-link:hover {
+            background: #e8f5e9;
+        }
+        
+        .project-title {
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        
+        .no-data {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            text-align: center;
+            color: #666;
+        }
+        
+        @media (max-width: 768px) {
+            .site-title {
+                font-size: 1.5rem;
+            }
+            
+            nav a {
+                margin-right: 1rem;
+                padding: 0.4rem 0.8rem;
+                font-size: 0.9rem;
+            }
+            
+            main {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-shell">
+        <header>
+            <div class="site-title">{{ heading }}</div>
+            <div class="owner-info">名字: {{ name }}</div>
+            <div class="student-id">座號: {{ student_id }}</div>
+        </header>
+        
+        <nav>
+            <a href="{% url 'index' %}">首頁</a>
+            <a href="{% url 'dashboard' %}">感測器儀表板</a>
+            <a href="{% url 'raw_data' %}">原始數據</a>
+            <a href="{% url 'projects' %}">組專題</a>
+            <a href="{% url 'about' %}">關於</a>
+        </nav>
+        
+        <main>
+            <h2 class="section-title">即時感測器數據</h2>
+            <p style="color: white; margin-bottom: 1.5rem;">{{ message }}</p>
+            
+            {% if latest_readings %}
+                <div class="sensor-grid">
+                    {% for sensor_id, reading in latest_readings.items %}
+                        <div class="sensor-card">
+                            <div class="sensor-name">{{ reading.name }}</div>
+                            <div class="sensor-value">{{ reading.value|floatformat:2 }}</div>
+                            <div class="sensor-unit">{{ reading.unit }}</div>
+                            <div class="sensor-topic">{{ reading.mqtt_topic }}</div>
+                            <div class="sensor-timestamp">更新時間: {{ reading.timestamp|date:"Y-m-d H:i:s" }}</div>
+                            <a href="{% url 'sensor_detail' sensor_id %}" class="view-button">查看詳情</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="no-data">
+                    <p>目前沒有感測器數據。請先配置MQTT感測器並啟動 mqtt_listener 服務。</p>
+                </div>
+            {% endif %}
+            
+            {% if project_links %}
+                <div class="projects-section">
+                    <h3 class="section-title">組專題</h3>
+                    {% for project in project_links %}
+                        <a href="{{ project.url }}" target="_blank" class="project-link">
+                            <div class="project-title">{{ project.title }}</div>
+                            {% if project.description %}
+                                <div style="font-size: 0.9rem; color: #666; margin-top: 0.3rem;">{{ project.description }}</div>
+                            {% endif %}
+                        </a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </main>
+    </div>
+</body>
+</html>
         background: rgba(255, 255, 255, 0.12);
         display: block;
       }

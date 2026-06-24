@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>原始感測器資料</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: "Noto Sans TC", Arial, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+        
+        .page-shell {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 1.5rem 2rem;
+            text-align: center;
+            border-bottom: 2px solid #4CAF50;
+        }
+        
+        .site-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .owner-info {
+            font-size: 1rem;
+            margin-bottom: 0.3rem;
+        }
+        
+        .student-id {
+            font-size: 0.9rem;
+            color: #4CAF50;
+        }
+        
+        nav {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 0.5rem 2rem;
+            border-bottom: 1px solid #333;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-right: 2rem;
+            padding: 0.5rem 1rem;
+            display: inline-block;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        
+        nav a:hover {
+            background: #4CAF50;
+        }
+        
+        main {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: white;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 0.5rem;
+        }
+        
+        .filters {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .filter-group {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        
+        .filter-group label {
+            font-weight: bold;
+            min-width: 80px;
+        }
+        
+        .filter-group select,
+        .filter-group button {
+            padding: 0.6rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .filter-group button {
+            background: #4CAF50;
+            color: white;
+            cursor: pointer;
+            border: none;
+            transition: background 0.3s;
+        }
+        
+        .filter-group button:hover {
+            background: #45a049;
+        }
+        
+        .data-table {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+        
+        .data-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table thead {
+            background: #4CAF50;
+            color: white;
+            position: sticky;
+            top: 0;
+        }
+        
+        .data-table th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        .data-table td {
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .data-table tbody tr:hover {
+            background: #f5f5f5;
+        }
+        
+        .value-cell {
+            font-weight: bold;
+            color: #4CAF50;
+            font-family: monospace;
+        }
+        
+        .timestamp-cell {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .sensor-cell {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .no-data {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            text-align: center;
+            color: #666;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        @media (max-width: 768px) {
+            main {
+                padding: 1rem;
+            }
+            
+            .filter-group {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .data-table {
+                font-size: 0.85rem;
+            }
+            
+            .data-table th,
+            .data-table td {
+                padding: 0.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-shell">
+        <header>
+            <div class="site-title">原始感測器資料</div>
+            <div class="owner-info">名字: {{ name }}</div>
+            <div class="student-id">座號: {{ student_id }}</div>
+        </header>
+        
+        <nav>
+            <a href="{% url 'index' %}">首頁</a>
+            <a href="{% url 'dashboard' %}">感測器儀表板</a>
+            <a href="{% url 'raw_data' %}">原始數據</a>
+            <a href="{% url 'projects' %}">組專題</a>
+            <a href="{% url 'about' %}">關於</a>
+        </nav>
+        
+        <main>
+            <h2 class="section-title">資料瀏覽</h2>
+            
+            <div class="filters">
+                <form method="get">
+                    <div class="filter-group">
+                        <label for="sensor">感測器</label>
+                        <select name="sensor" id="sensor">
+                            <option value="">所有感測器</option>
+                            {% for sensor in sensors %}
+                                <option value="{{ sensor.id }}" {% if selected_sensor.id == sensor.id %}selected{% endif %}>
+                                    {{ sensor.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="days">時間範圍</label>
+                        <select name="days" id="days">
+                            <option value="1" {% if days == 1 %}selected{% endif %}>最近 1 天</option>
+                            <option value="7" {% if days == 7 %}selected{% endif %}>最近 7 天</option>
+                            <option value="30" {% if days == 30 %}selected{% endif %}>最近 30 天</option>
+                            <option value="90" {% if days == 90 %}selected{% endif %}>最近 90 天</option>
+                        </select>
+                    </div>
+                    <button type="submit">篩選</button>
+                </form>
+            </div>
+            
+            {% if readings %}
+                <div class="data-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>感測器</th>
+                                <th>數值</th>
+                                <th>單位</th>
+                                <th>時間</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for reading in readings %}
+                                <tr>
+                                    <td class="sensor-cell">{{ reading.sensor.name }}</td>
+                                    <td class="value-cell">{{ reading.value|floatformat:4 }}</td>
+                                    <td>{{ reading.sensor.unit }}</td>
+                                    <td class="timestamp-cell">{{ reading.timestamp|date:"Y-m-d H:i:s" }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div style="color: white; text-align: center; margin-top: 1rem;">
+                    顯示最近 1000 筆記錄
+                </div>
+            {% else %}
+                <div class="no-data">
+                    <p>在指定的時間範圍內沒有資料。</p>
+                </div>
+            {% endif %}
+        </main>
+    </div>
+</body>
+</html>
