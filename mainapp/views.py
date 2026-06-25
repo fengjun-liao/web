@@ -27,12 +27,25 @@ def index(request):
         latest = sensor.readings.first()
         if latest:
             latest_readings[sensor.id] = {
+                'id': sensor.id,
                 'name': sensor.name,
                 'value': latest.value,
                 'unit': sensor.unit,
                 'timestamp': latest.timestamp,
                 'mqtt_topic': sensor.mqtt_topic,
             }
+    
+    sensor_names = ["水位", "濕度1", "濕度2", "濕度3"]
+    latest_by_name = {value['name']: value for value in latest_readings.values()}
+    sensor_cards = []
+    for name in sensor_names:
+        info = latest_by_name.get(name)
+        sensor_cards.append({
+            'name': name,
+            'value': info['value'] if info else None,
+            'unit': info['unit'] if info else '',
+            'timestamp': info['timestamp'] if info else None,
+        })
     
     # Get project links
     project_links = ProjectLink.objects.all()
@@ -44,6 +57,7 @@ def index(request):
         "name": PERSONAL_INFO['name'],
         "student_id": PERSONAL_INFO['student_id'],
         "latest_readings": latest_readings,
+        "sensor_cards": sensor_cards,
         "sensors_count": sensors.count(),
         "project_links": project_links,
     }
