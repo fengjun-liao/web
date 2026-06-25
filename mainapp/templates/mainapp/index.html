@@ -14,7 +14,7 @@
         
         body {
           font-family: "Noto Sans TC", Arial, sans-serif;
-          background: linear-gradient(135deg, rgba(30,60,114,0.6) 0%, rgba(42,82,152,0.6) 100%), url('https://photo.16pic.com/00/92/70/16pic_9270998_b.jpg') center/cover no-repeat;
+          background: linear-gradient(135deg, rgba(30,60,114,0.6) 0%, rgba(42,82,152,0.6) 100%), url('https://img.pikbest.com/wp/202344/foliage-and-leaves-vibrant-backdrop-a-lush-canopy-of-green_9924937.jpg!f305cw') center/cover no-repeat;
           color: #333;
           min-height: 100vh;
           background-attachment: fixed;
@@ -91,9 +91,10 @@
         
         .sensor-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 1.5rem;
             margin-bottom: 2rem;
+            max-width: 900px;
         }
         
         .sensor-card {
@@ -197,15 +198,19 @@
             .site-title {
                 font-size: 1.5rem;
             }
-          nav {
-            justify-content: center;
-            gap: 0.6rem;
-          }
-          nav a {
-            margin: 0;
-            padding: 0.4rem 0.8rem;
-            font-size: 0.9rem;
-          }
+            nav {
+                justify-content: center;
+                gap: 0.6rem;
+            }
+            nav a {
+                margin: 0;
+                padding: 0.4rem 0.8rem;
+                font-size: 0.9rem;
+            }
+            
+            .sensor-grid {
+                grid-template-columns: 1fr;
+            }
             
             main {
                 padding: 1rem;
@@ -223,42 +228,35 @@
         
         <nav>
             <a href="{% url 'index' %}">首頁</a>
+            <a href="http://172.20.10.7/">前往第五組網站</a>
         </nav>
         
         <main>
             <h2 class="section-title">即時感測器數據</h2>
             <p style="color: white; margin-bottom: 1.5rem;">{{ message }}</p>
             
-            <div class="data-table">
-              <table>
-                <thead>
-                  <tr>
-                    <th>感測器</th>
-                    <th>數值</th>
-                    <th>單位</th>
-                    <th>更新時間</th>
-                    <th>操作</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% if latest_readings %}
-                    {% for sensor_id, reading in latest_readings.items %}
-                      <tr>
-                        <td class="sensor-name">{{ reading.name }}</td>
-                        <td class="sensor-value">{{ reading.value|floatformat:2 }}</td>
-                        <td class="sensor-unit">{{ reading.unit }}</td>
-                        <td class="sensor-timestamp">{{ reading.timestamp|date:"Y-m-d H:i:s" }}</td>
-                        <td><a href="{% url 'sensor_detail' sensor_id %}" class="view-button">查看詳情</a></td>
-                      </tr>
+            {% if latest_readings %}
+                <div class="sensor-grid">
+                    {% for sensor_name in "水位,濕度1,濕度2,濕度3" %}
+                        {% for sensor_id, reading in latest_readings.items %}
+                            {% if reading.name == sensor_name %}
+                                <div class="sensor-card">
+                                    <div class="sensor-name">{{ reading.name }}</div>
+                                    <div class="sensor-value">{{ reading.value|floatformat:2 }}</div>
+                                    <div class="sensor-unit">{{ reading.unit }}</div>
+                                    <div class="sensor-topic">{{ reading.mqtt_topic }}</div>
+                                    <div class="sensor-timestamp">更新時間: {{ reading.timestamp|date:"Y-m-d H:i:s" }}</div>
+                                    <a href="{% url 'sensor_detail' sensor_id %}" class="view-button">查看詳情</a>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
                     {% endfor %}
-                  {% else %}
-                    <tr>
-                      <td colspan="5" style="text-align:center; color:#666; padding:1.2rem;">目前尚無感測器資料</td>
-                    </tr>
-                  {% endif %}
-                </tbody>
-              </table>
-            </div>
+                </div>
+            {% else %}
+                <div class="no-data">
+                    <p>目前尚無感測器資料。</p>
+                </div>
+            {% endif %}
             
             {% if project_links %}
                 <div class="projects-section">
