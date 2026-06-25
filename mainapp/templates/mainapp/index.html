@@ -92,17 +92,29 @@
         .sensor-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 1.5rem;
+            gap: 2rem; /* 卡片之間的水平與垂直間距 */
+            column-gap: 2rem;
+            row-gap: 2rem;
             margin-bottom: 2rem;
             max-width: 900px;
+            justify-items: stretch; /* 使每格填滿欄位，卡片寬度一致 */
+            align-items: start;
         }
         
         .sensor-card {
             background: white;
             border-radius: 8px;
-            padding: 1.5rem;
+            padding: 1rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            width: 100%;
+            aspect-ratio: 1 / 1; /* 正方形 */
+            gap: 0.5rem;
+            box-sizing: border-box;
         }
         
         .sensor-card:hover {
@@ -145,7 +157,7 @@
         
         .view-button {
             display: inline-block;
-            margin-top: 1rem;
+            margin-top: auto; /* 推到卡片底部 */
             padding: 0.5rem 1rem;
             background: #4CAF50;
             color: white;
@@ -237,19 +249,60 @@
             
             {% if latest_readings %}
                 <div class="sensor-grid">
-                    {% for sensor_name in "水位,濕度1,濕度2,濕度3" %}
-                        {% for sensor_id, reading in latest_readings.items %}
-                            {% if reading.name == sensor_name %}
-                                <div class="sensor-card">
-                                    <div class="sensor-name">{{ reading.name }}</div>
-                                    <div class="sensor-value">{{ reading.value|floatformat:2 }}</div>
-                                    <div class="sensor-unit">{{ reading.unit }}</div>
-                                    <div class="sensor-topic">{{ reading.mqtt_topic }}</div>
-                                    <div class="sensor-timestamp">更新時間: {{ reading.timestamp|date:"Y-m-d H:i:s" }}</div>
-                                    <a href="{% url 'sensor_detail' sensor_id %}" class="view-button">查看詳情</a>
-                                </div>
-                            {% endif %}
-                        {% endfor %}
+                    {# 水位 #}
+                    {% for sensor_id, reading in latest_readings.items %}
+                        {% if reading.name == "水位" %}
+                            <div class="sensor-card">
+                                <div class="sensor-name">{{ reading.name }}</div>
+                                <div class="sensor-value">{{ reading.value|floatformat:2 }}</div>
+                                <div class="sensor-unit">{{ reading.unit }}</div>
+                                <div class="sensor-topic">{{ reading.mqtt_topic }}</div>
+                                <div class="sensor-timestamp">更新時間: {{ reading.timestamp|date:"Y-m-d H:i:s" }}</div>
+                                <a href="{% url 'sensor_detail' sensor_id %}" class="view-button">查看詳情</a>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+
+                    {# 濕度1 #}
+                    {% for sensor_id, reading in latest_readings.items %}
+                        {% if reading.name == "濕度1" %}
+                            <div class="sensor-card">
+                                <div class="sensor-name">{{ reading.name }}</div>
+                                <div class="sensor-value">{{ reading.value|floatformat:2 }}</div>
+                                <div class="sensor-unit">{{ reading.unit }}</div>
+                                <div class="sensor-topic">{{ reading.mqtt_topic }}</div>
+                                <div class="sensor-timestamp">更新時間: {{ reading.timestamp|date:"Y-m-d H:i:s" }}</div>
+                                <a href="{% url 'sensor_detail' sensor_id %}" class="view-button">查看詳情</a>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+
+                    {# 濕度2 #}
+                    {% for sensor_id, reading in latest_readings.items %}
+                        {% if reading.name == "濕度2" %}
+                            <div class="sensor-card">
+                                <div class="sensor-name">{{ reading.name }}</div>
+                                <div class="sensor-value">{{ reading.value|floatformat:2 }}</div>
+                                <div class="sensor-unit">{{ reading.unit }}</div>
+                                <div class="sensor-topic">{{ reading.mqtt_topic }}</div>
+                                <div class="sensor-timestamp">更新時間: {{ reading.timestamp|date:"Y-m-d H:i:s" }}</div>
+                                <a href="{% url 'sensor_detail' sensor_id %}" class="view-button">查看詳情</a>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+
+                    {# 濕度3 #}
+                    {% for sensor_id, reading in latest_readings.items %}
+                        {% if reading.name == "濕度3" %}
+                            <div class="sensor-card">
+                                <div class="sensor-name">{{ reading.name }}</div>
+                                <div class="sensor-value">{{ reading.value|floatformat:2 }}</div>
+                                <div class="sensor-unit">{{ reading.unit }}</div>
+                                <div class="sensor-topic">{{ reading.mqtt_topic }}</div>
+                                <div class="sensor-timestamp">更新時間: {{ reading.timestamp|date:"Y-m-d H:i:s" }}</div>
+                                <a href="{% url 'sensor_detail' sensor_id %}" class="view-button">查看詳情</a>
+                            </div>
+                        {% endif %}
                     {% endfor %}
                 </div>
             {% else %}
