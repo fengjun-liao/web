@@ -83,8 +83,12 @@ DATABASES = {
         'PORT': '3306',
         'OPTIONS': {
             'ssl': {
-                'disabled': True,  # 這行是為了在 Docker 環境中使用 SSL
-                
+                'ca': None,
+                'cert': None,
+                'key': None,
+                'check_hostname': False
+                  # 這行是為了在 Docker 環境中使用 SSL
+
             },  # 這行是為了在 Docker 環境中使用 SSL
     }
 }
