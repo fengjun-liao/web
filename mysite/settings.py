@@ -90,9 +90,9 @@ DATABASES = {
                   # 這行是為了在 Docker 環境中使用 SSL
 
             },  # 這行是為了在 Docker 環境中使用 SSL
+        }
     }
 }
-
 
 
 # Password validation
