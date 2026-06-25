@@ -17,9 +17,8 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
-from mainapp import views as main_views  # 引入 mainapp 的 views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', main_views.index, name='index'), # 將首頁綁定到 index 視圖
+    path('', include('mainapp.urls')),
 ]
