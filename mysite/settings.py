@@ -82,14 +82,7 @@ DATABASES = {
         'HOST': 'db',        # 🌟 這裡必須填你們 MySQL 在 docker-compose 裡的 service 名稱！
         'PORT': '3306',
         'OPTIONS': {
-            'ssl': {
-                'ca': None,
-                'cert': None,
-                'key': None,
-                
-                  # 這行是為了在 Docker 環境中使用 SSL
-
-            },  # 這行是為了在 Docker 環境中使用 SSL
+            'ssl': {},  # 這行是為了在 Docker 環境中使用 SSL
         }
     }
 }
