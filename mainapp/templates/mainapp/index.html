@@ -216,11 +216,40 @@
             margin-bottom: 0.5rem;
         }
 
+        .chart-legend-info {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            font-size: 0.85rem;
+            margin-bottom: 0.8rem;
+            padding: 0.5rem 0;
+            color: #555;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 2px;
+            border-radius: 2px;
+        }
+
         .chart-container {
             height: 320px;
             background: transparent;
             border-radius: 8px;
             overflow: hidden;
+        }
+
+        .chart-timestamp {
+            text-align: center;
+            margin-top: 0.8rem;
+            font-size: 0.9rem;
+            color: #666;
         }
 
         footer.app-footer {
@@ -447,9 +476,28 @@
             <!-- 圖表區塊 -->
             <div class="chart-wrapper">
                 <h2 class="section-title">感測器歷史資料圖表</h2>
+                <div class="chart-legend-info">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #3B82F6;"></div>
+                        <span>水位</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #10B981;"></div>
+                        <span>濕度1</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #F59E0B;"></div>
+                        <span>濕度2</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #8B5CF6;"></div>
+                        <span>濕度3</span>
+                    </div>
+                </div>
                 <div class="chart-container">
                     <canvas id="sensorChart"></canvas>
                 </div>
+                <div class="chart-timestamp" id="chartTimestamp"></div>
             </div>
             
             <footer class="app-footer">
@@ -566,11 +614,16 @@
                         },
                         scales: {
                             y: {
-                                beginAtZero: false,
+                                beginAtZero: true,
+                                min: 0,
+                                max: 100,
                                 ticks: {
                                     font: {
                                         size: 11,
                                     },
+                                    callback: function(value) {
+                                        return value + '%';
+                                    }
                                 },
                                 grid: {
                                     color: 'rgba(0,0,0,0.05)',
@@ -596,11 +649,34 @@
             }
         }
 
-        // 頁面載入時初始化圖表
-        document.addEventListener('DOMContentLoaded', loadChartData);
+        // 更新圖表下方的時間
+        function updateChartTimestamp() {
+            const now = new Date();
+            const timeStr = now.toLocaleString('zh-TW', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            const timestampEl = document.getElementById('chartTimestamp');
+            if (timestampEl) {
+                timestampEl.textContent = '最後更新: ' + timeStr;
+            }
+        }
 
-        // 每 30 秒自動更新圖表
-        setInterval(loadChartData, 30000);
+        // 頁面載入時初始化圖表
+        document.addEventListener('DOMContentLoaded', function() {
+            loadChartData();
+            updateChartTimestamp();
+        });
+
+        // 每分鐘自動更新圖表
+        setInterval(loadChartData, 60000);
+
+        // 每秒更新時間顯示
+        setInterval(updateChartTimestamp, 1000);
     </script>
 </body>
 </html>
