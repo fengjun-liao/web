@@ -326,177 +326,124 @@
             <h2 class="section-title">即時感測器數據</h2>
             <p style="color: white; margin-bottom: 1.5rem;">{{ message }}</p>
             
-            {% if latest_readings %}
-                <div class="top-section" style="display:flex; gap:1.5rem; align-items:flex-start;">
-                    <div class="sensor-area" style="flex:3;">
-                        <div class="sensor-grid">
-                    {# 水位 #}
-                    {% with found=False %}
-                        {% for sensor_id, reading in latest_readings.items %}
+            <div class="sensor-grid">
+                {# 水位 #}
+                <div class="sensor-card">
+                    {% with found_water=False %}
+                        {% for sid, reading in latest_readings.items %}
                             {% if reading.name == "水位" %}
-                                {% with found=True %}
-                                <div class="sensor-card">
-                                    <div class="sensor-name">{{ reading.name }}</div>
-                                    <div class="sensor-value">{{ reading.value|floatformat:2 }}</div>
-                                    <div class="sensor-unit">{{ reading.unit }}</div>
-                                    <div class="sensor-topic">{{ reading.mqtt_topic }}</div>
-                                    <div class="sensor-timestamp">更新時間: {{ reading.timestamp|date:"Y-m-d H:i:s" }}</div>
-                                    <a href="{% url 'sensor_detail' sensor_id %}" class="view-button">查看詳情</a>
-                                </div>
+                                {% with found_water=True %}
+                                <div class="sensor-name">{{ reading.name }}</div>
+                                <div class="sensor-value">{{ reading.value|floatformat:2 }}</div>
+                                <div class="sensor-unit">{{ reading.unit }}</div>
+                                <div class="sensor-timestamp">更新時間: {{ reading.timestamp|date:"Y-m-d H:i:s" }}</div>
+                                <a href="{% url 'sensor_detail' sid %}" class="view-button">查看詳情</a>
                                 {% endwith %}
                             {% endif %}
                         {% endfor %}
-                        {% if not found %}
-                        <div class="sensor-card">
+                    {% endwith %}
+                    {% with found_water=False %}
+                        {% for sid, reading in latest_readings.items %}
+                            {% if reading.name == "水位" %}
+                                {% with found_water=True %}{% endwith %}
+                            {% endif %}
+                        {% endfor %}
+                        {% if not found_water %}
                             <div class="sensor-name">水位</div>
                             <div class="sensor-value">--</div>
                             <div class="sensor-status">等待資料更新</div>
-                        </div>
                         {% endif %}
                     {% endwith %}
+                </div>
 
-                    {# 濕度1 #}
-                    {% with found=False %}
-                        {% for sensor_id, reading in latest_readings.items %}
+                {# 濕度1 #}
+                <div class="sensor-card">
+                    {% with found_humidity1=False %}
+                        {% for sid, reading in latest_readings.items %}
                             {% if reading.name == "濕度1" %}
-                                {% with found=True %}
-                                <div class="sensor-card">
-                                    <div class="sensor-name">{{ reading.name }}</div>
-                                    <div class="sensor-value">{{ reading.value|floatformat:2 }}</div>
-                                    <div class="sensor-unit">{{ reading.unit }}</div>
-                                    <div class="sensor-topic">{{ reading.mqtt_topic }}</div>
-                                    <div class="sensor-timestamp">更新時間: {{ reading.timestamp|date:"Y-m-d H:i:s" }}</div>
-                                    <a href="{% url 'sensor_detail' sensor_id %}" class="view-button">查看詳情</a>
-                                </div>
+                                {% with found_humidity1=True %}
+                                <div class="sensor-name">{{ reading.name }}</div>
+                                <div class="sensor-value">{{ reading.value|floatformat:2 }}</div>
+                                <div class="sensor-unit">{{ reading.unit }}</div>
+                                <div class="sensor-timestamp">更新時間: {{ reading.timestamp|date:"Y-m-d H:i:s" }}</div>
+                                <a href="{% url 'sensor_detail' sid %}" class="view-button">查看詳情</a>
                                 {% endwith %}
                             {% endif %}
                         {% endfor %}
-                        {% if not found %}
-                        <div class="sensor-card">
+                    {% endwith %}
+                    {% with found_humidity1=False %}
+                        {% for sid, reading in latest_readings.items %}
+                            {% if reading.name == "濕度1" %}
+                                {% with found_humidity1=True %}{% endwith %}
+                            {% endif %}
+                        {% endfor %}
+                        {% if not found_humidity1 %}
                             <div class="sensor-name">濕度1</div>
                             <div class="sensor-value">--</div>
                             <div class="sensor-status">等待資料更新</div>
-                        </div>
                         {% endif %}
                     {% endwith %}
+                </div>
 
-                    {# 濕度2 #}
-                    {% with found=False %}
-                        {% for sensor_id, reading in latest_readings.items %}
+                {# 濕度2 #}
+                <div class="sensor-card">
+                    {% with found_humidity2=False %}
+                        {% for sid, reading in latest_readings.items %}
                             {% if reading.name == "濕度2" %}
-                                {% with found=True %}
-                                <div class="sensor-card">
-                                    <div class="sensor-name">{{ reading.name }}</div>
-                                    <div class="sensor-value">{{ reading.value|floatformat:2 }}</div>
-                                    <div class="sensor-unit">{{ reading.unit }}</div>
-                                    <div class="sensor-topic">{{ reading.mqtt_topic }}</div>
-                                    <div class="sensor-timestamp">更新時間: {{ reading.timestamp|date:"Y-m-d H:i:s" }}</div>
-                                    <a href="{% url 'sensor_detail' sensor_id %}" class="view-button">查看詳情</a>
-                                </div>
+                                {% with found_humidity2=True %}
+                                <div class="sensor-name">{{ reading.name }}</div>
+                                <div class="sensor-value">{{ reading.value|floatformat:2 }}</div>
+                                <div class="sensor-unit">{{ reading.unit }}</div>
+                                <div class="sensor-timestamp">更新時間: {{ reading.timestamp|date:"Y-m-d H:i:s" }}</div>
+                                <a href="{% url 'sensor_detail' sid %}" class="view-button">查看詳情</a>
                                 {% endwith %}
                             {% endif %}
                         {% endfor %}
-                        {% if not found %}
-                        <div class="sensor-card">
+                    {% endwith %}
+                    {% with found_humidity2=False %}
+                        {% for sid, reading in latest_readings.items %}
+                            {% if reading.name == "濕度2" %}
+                                {% with found_humidity2=True %}{% endwith %}
+                            {% endif %}
+                        {% endfor %}
+                        {% if not found_humidity2 %}
                             <div class="sensor-name">濕度2</div>
                             <div class="sensor-value">--</div>
                             <div class="sensor-status">等待資料更新</div>
-                        </div>
                         {% endif %}
                     {% endwith %}
+                </div>
 
-                    {# 濕度3 #}
-                    {% with found=False %}
-                        {% for sensor_id, reading in latest_readings.items %}
+                {# 濕度3 #}
+                <div class="sensor-card">
+                    {% with found_humidity3=False %}
+                        {% for sid, reading in latest_readings.items %}
                             {% if reading.name == "濕度3" %}
-                                {% with found=True %}
-                                <div class="sensor-card">
-                                    <div class="sensor-name">{{ reading.name }}</div>
-                                    <div class="sensor-value">{{ reading.value|floatformat:2 }}</div>
-                                    <div class="sensor-unit">{{ reading.unit }}</div>
-                                    <div class="sensor-topic">{{ reading.mqtt_topic }}</div>
-                                    <div class="sensor-timestamp">更新時間: {{ reading.timestamp|date:"Y-m-d H:i:s" }}</div>
-                                    <a href="{% url 'sensor_detail' sensor_id %}" class="view-button">查看詳情</a>
-                                </div>
+                                {% with found_humidity3=True %}
+                                <div class="sensor-name">{{ reading.name }}</div>
+                                <div class="sensor-value">{{ reading.value|floatformat:2 }}</div>
+                                <div class="sensor-unit">{{ reading.unit }}</div>
+                                <div class="sensor-timestamp">更新時間: {{ reading.timestamp|date:"Y-m-d H:i:s" }}</div>
+                                <a href="{% url 'sensor_detail' sid %}" class="view-button">查看詳情</a>
                                 {% endwith %}
                             {% endif %}
                         {% endfor %}
-                        {% if not found %}
-                        <div class="sensor-card">
+                    {% endwith %}
+                    {% with found_humidity3=False %}
+                        {% for sid, reading in latest_readings.items %}
+                            {% if reading.name == "濕度3" %}
+                                {% with found_humidity3=True %}{% endwith %}
+                            {% endif %}
+                        {% endfor %}
+                        {% if not found_humidity3 %}
                             <div class="sensor-name">濕度3</div>
                             <div class="sensor-value">--</div>
                             <div class="sensor-status">等待資料更新</div>
-                        </div>
                         {% endif %}
                     {% endwith %}
-
-                    {# 濕度2 #}
-                    {% for sensor_id, reading in latest_readings.items %}
-                        {% if reading.name == "濕度2" %}
-                            <div class="sensor-card">
-                                <div class="sensor-name">{{ reading.name }}</div>
-                                <div class="sensor-value">{{ reading.value|floatformat:2 }}</div>
-                                <div class="sensor-unit">{{ reading.unit }}</div>
-                                <div class="sensor-topic">{{ reading.mqtt_topic }}</div>
-                                <div class="sensor-timestamp">更新時間: {{ reading.timestamp|date:"Y-m-d H:i:s" }}</div>
-                                <a href="{% url 'sensor_detail' sensor_id %}" class="view-button">查看詳情</a>
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-
-                    {# 濕度3 #}
-                    {% for sensor_id, reading in latest_readings.items %}
-                        {% if reading.name == "濕度3" %}
-                            <div class="sensor-card">
-                                <div class="sensor-name">{{ reading.name }}</div>
-                                <div class="sensor-value">{{ reading.value|floatformat:2 }}</div>
-                                <div class="sensor-unit">{{ reading.unit }}</div>
-                                <div class="sensor-topic">{{ reading.mqtt_topic }}</div>
-                                <div class="sensor-timestamp">更新時間: {{ reading.timestamp|date:"Y-m-d H:i:s" }}</div>
-                                <a href="{% url 'sensor_detail' sensor_id %}" class="view-button">查看詳情</a>
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                        </div>
-                    </div>
-
-                    <aside class="time-area" style="flex:1;">
-                        <div class="time-card">
-                            <div class="sensor-status">現在時間</div>
-                            <div id="current-time" class="time-now">--:--:--</div>
-                            <div id="current-date" class="sensor-status" style="margin-top:0.25rem;">----</div>
-                        </div>
-                    </aside>
                 </div>
-
-                <div class="chart-wrapper">
-                    <div class="chart-controls">
-                        <button id="toggle-chart" class="view-button">隱藏圖表</button>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="history-chart"></canvas>
-                    </div>
-                </div>
-            {% else %}
-                <div class="no-data">
-                    <p>目前尚無感測器資料。</p>
-                </div>
-            {% endif %}
+            </div>
             
-            {% if project_links %}
-                <div class="projects-section">
-                    <h3 class="section-title">組專題</h3>
-                    {% for project in project_links %}
-                        <a href="{{ project.url }}" target="_blank" class="project-link">
-                            <div class="project-title">{{ project.title }}</div>
-                            {% if project.description %}
-                                <div style="font-size: 0.9rem; color: #666; margin-top: 0.3rem;">{{ project.description }}</div>
-                            {% endif %}
-                        </a>
-                    {% endfor %}
-                </div>
-            {% endif %}
-
             <footer class="app-footer">
                 <a href="/raw-data/" class="footer-button">查看原始資料</a>
             </footer>
