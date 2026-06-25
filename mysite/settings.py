@@ -81,6 +81,11 @@ DATABASES = {
         'PASSWORD': 'admin_password_555',     # 你們設定的 MySQL 密碼
         'HOST': 'db',        # 🌟 這裡必須填你們 MySQL 在 docker-compose 裡的 service 名稱！
         'PORT': '3306',
+        'OPTIONS': {
+            'ssl': {
+                'disabled': True,  # 這行是為了在 Docker 環境中使用 SSL
+                
+            },  # 這行是為了在 Docker 環境中使用 SSL
     }
 }
 
