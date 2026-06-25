@@ -444,6 +444,14 @@
                 </div>
             </div>
             
+            <!-- 圖表區塊 -->
+            <div class="chart-wrapper">
+                <h2 class="section-title">感測器歷史資料圖表</h2>
+                <div class="chart-container">
+                    <canvas id="sensorChart"></canvas>
+                </div>
+            </div>
+            
             <footer class="app-footer">
                 <a href="/raw-data/" class="footer-button">查看原始資料</a>
             </footer>
@@ -451,32 +459,148 @@
     </div>
 
     <script>
-        function updateTime() {
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString('zh-TW');
-            const dateStr = now.toLocaleDateString('zh-TW');
-            const timeEl = document.getElementById('current-time');
-            const dateEl = document.getElementById('current-date');
-            if (timeEl) timeEl.textContent = timeStr;
-            if (dateEl) dateEl.textContent = dateStr;
-        }
-        setInterval(updateTime, 1000);
-        updateTime();
+        // 初始化圖表
+        let sensorChart = null;
 
-        const toggleBtn = document.getElementById('toggle-chart');
-        if (toggleBtn) {
-            toggleBtn.addEventListener('click', function () {
-                const container = document.querySelector('.chart-container');
-                if (!container) return;
-                if (container.style.display === 'none') {
-                    container.style.display = '';
-                    this.textContent = '隱藏圖表';
-                } else {
-                    container.style.display = 'none';
-                    this.textContent = '顯示圖表';
+        async function loadChartData() {
+            try {
+                // 從後端 API 獲取數據
+                const response = await fetch('/api/chart-history/?days=1');
+                const data = await response.json();
+                
+                if (!data.timestamps || !data.sensors) {
+                    console.error('Invalid data format from API');
+                    return;
                 }
-            });
+
+                // 準備 Chart.js 數據集
+                const datasets = [];
+                const colors = [
+                    { border: '#3B82F6', bg: 'rgba(59, 130, 246, 0.1)' },   // 藍色 - 水位
+                    { border: '#10B981', bg: 'rgba(16, 185, 129, 0.1)' },   // 綠色 - 濕度1
+                    { border: '#F59E0B', bg: 'rgba(245, 158, 11, 0.1)' },   // 橘色 - 濕度2
+                    { border: '#8B5CF6', bg: 'rgba(139, 92, 246, 0.1)' },   // 紫色 - 濕度3
+                ];
+
+                const sensorNames = ['水位', '濕度1', '濕度2', '濕度3'];
+                
+                sensorNames.forEach((name, index) => {
+                    const sensorReadings = data.sensors[name] || {};
+                    const values = sensorReadings.values || [];
+                    
+                    // 映射時間戳到值
+                    const chartValues = data.timestamps.map(ts => {
+                        const reading = values.find(v => v.timestamp === ts);
+                        return reading ? reading.value : null;
+                    });
+
+                    datasets.push({
+                        label: `${name} (${sensorReadings.unit || ''})`,
+                        data: chartValues,
+                        borderColor: colors[index].border,
+                        backgroundColor: colors[index].bg,
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 3,
+                        pointBackgroundColor: colors[index].border,
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 1,
+                    });
+                });
+
+                // 格式化時間戳用於顯示
+                const formattedTimestamps = data.timestamps.map(ts => {
+                    const date = new Date(ts);
+                    return date.toLocaleTimeString('zh-TW', { 
+                        hour: '2-digit', 
+                        minute: '2-digit',
+                        second: '2-digit'
+                    });
+                });
+
+                // 初始化或更新圖表
+                const ctx = document.getElementById('sensorChart');
+                if (!ctx) return;
+
+                if (sensorChart) {
+                    sensorChart.destroy();
+                }
+
+                sensorChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: formattedTimestamps,
+                        datasets: datasets,
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        interaction: {
+                            intersect: false,
+                            mode: 'index',
+                        },
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                                labels: {
+                                    padding: 15,
+                                    font: {
+                                        size: 12,
+                                        family: '"Noto Sans TC", Arial, sans-serif',
+                                    },
+                                },
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0,0,0,0.7)',
+                                padding: 10,
+                                titleFont: {
+                                    size: 13,
+                                },
+                                bodyFont: {
+                                    size: 12,
+                                },
+                                displayColors: true,
+                            },
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                ticks: {
+                                    font: {
+                                        size: 11,
+                                    },
+                                },
+                                grid: {
+                                    color: 'rgba(0,0,0,0.05)',
+                                },
+                            },
+                            x: {
+                                ticks: {
+                                    font: {
+                                        size: 11,
+                                    },
+                                    maxRotation: 45,
+                                    minRotation: 0,
+                                },
+                                grid: {
+                                    display: false,
+                                },
+                            },
+                        },
+                    },
+                });
+            } catch (error) {
+                console.error('Error loading chart data:', error);
+            }
         }
+
+        // 頁面載入時初始化圖表
+        document.addEventListener('DOMContentLoaded', loadChartData);
+
+        // 每 30 秒自動更新圖表
+        setInterval(loadChartData, 30000);
     </script>
 </body>
 </html>

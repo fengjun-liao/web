@@ -200,3 +200,45 @@ def projects(request):
     }
     
     return render(request, 'mainapp/projects.html', context)
+
+
+@require_http_methods(["GET"])
+def chart_history_api(request):
+    """API endpoint to get all sensors' history data for charts in JSON format"""
+    # Get data for the last N days
+    days = int(request.GET.get('days', 1))
+    time_threshold = timezone.now() - timedelta(days=days)
+    
+    # Define sensor names to fetch
+    sensor_names = ['水位', '濕度1', '濕度2', '濕度3']
+    
+    # Prepare response data
+    timestamps = set()
+    sensor_data = {}
+    
+    for name in sensor_names:
+        try:
+            sensor = SensorType.objects.get(name=name)
+            readings = sensor.readings.filter(timestamp__gte=time_threshold).order_by('timestamp')
+            
+            sensor_data[name] = {
+                'values': [{'timestamp': r.timestamp.isoformat(), 'value': r.value} for r in readings],
+                'unit': sensor.unit,
+            }
+            
+            # Collect all timestamps
+            for r in readings:
+                timestamps.add(r.timestamp.isoformat())
+        except SensorType.DoesNotExist:
+            sensor_data[name] = {'values': [], 'unit': ''}
+    
+    # Sort timestamps
+    timestamps = sorted(list(timestamps))
+    
+    # Prepare data in the format Chart.js expects
+    data = {
+        'timestamps': timestamps,
+        'sensors': sensor_data,
+    }
+    
+    return JsonResponse(data)
