@@ -86,7 +86,7 @@ DATABASES = {
                 'ca': None,
                 'cert': None,
                 'key': None,
-                'check_hostname': False
+                
                   # 這行是為了在 Docker 環境中使用 SSL
 
             },  # 這行是為了在 Docker 環境中使用 SSL
