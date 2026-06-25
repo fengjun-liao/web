@@ -284,31 +284,33 @@
                     <div class="chart-container">
                         <canvas id="sensor-chart"></canvas>
                     </div>
-                    
-                    <h2 class="section-title">最近資料</h2>
-                    <div class="data-table">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>時間</th>
-                                    <th>數值</th>
-                                </tr>
-                            </thead>
-                            <tbody>
+                {% endif %}
+
+                <h2 class="section-title">最近資料</h2>
+                <div class="data-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>時間</th>
+                                <th>數值</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if readings %}
                                 {% for reading in readings|slice:":20" reversed %}
                                     <tr>
                                         <td>{{ reading.timestamp|date:"Y-m-d H:i:s" }}</td>
                                         <td class="value-cell">{{ reading.value|floatformat:2 }} {{ sensor.unit }}</td>
                                     </tr>
                                 {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                {% else %}
-                    <div class="no-data">
-                        <p>此感測器目前沒有資料。</p>
-                    </div>
-                {% endif %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="2" style="text-align:center; color:#666; padding:1.2rem;">目前尚無感測器資料</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
             {% endif %}
         </main>
     </div>

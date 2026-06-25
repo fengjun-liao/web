@@ -258,7 +258,6 @@
                 </form>
             </div>
             
-            {% if readings %}
                 <div class="data-table">
                     <table>
                         <thead>
@@ -270,25 +269,28 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for reading in readings %}
+                            {% if readings %}
+                                {% for reading in readings %}
+                                    <tr>
+                                        <td class="sensor-cell">{{ reading.sensor.name }}</td>
+                                        <td class="value-cell">{{ reading.value|floatformat:4 }}</td>
+                                        <td>{{ reading.sensor.unit }}</td>
+                                        <td class="timestamp-cell">{{ reading.timestamp|date:"Y-m-d H:i:s" }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
                                 <tr>
-                                    <td class="sensor-cell">{{ reading.sensor.name }}</td>
-                                    <td class="value-cell">{{ reading.value|floatformat:4 }}</td>
-                                    <td>{{ reading.sensor.unit }}</td>
-                                    <td class="timestamp-cell">{{ reading.timestamp|date:"Y-m-d H:i:s" }}</td>
+                                    <td colspan="4" style="text-align:center; color:#666; padding:1.2rem;">目前尚無感測器資料</td>
                                 </tr>
-                            {% endfor %}
+                            {% endif %}
                         </tbody>
                     </table>
                 </div>
-                <div style="color: white; text-align: center; margin-top: 1rem;">
-                    顯示最近 1000 筆記錄
-                </div>
-            {% else %}
-                <div class="no-data">
-                    <p>在指定的時間範圍內沒有資料。</p>
-                </div>
-            {% endif %}
+                {% if readings %}
+                    <div style="color: white; text-align: center; margin-top: 1rem;">
+                        顯示最近 1000 筆記錄
+                    </div>
+                {% endif %}
         </main>
     </div>
 </body>

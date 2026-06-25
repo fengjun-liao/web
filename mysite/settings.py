@@ -79,7 +79,7 @@ DATABASES = {
         'NAME': 'smart_pot_db',         # 你們大專案的資料庫名稱
         'USER': 'group5_admin',                 # MySQL 帳號
         'PASSWORD': 'admin_password_555',     # 你們設定的 MySQL 密碼
-        'HOST': '172.20.10.7',        # 🌟 這裡必須填你們 MySQL 在 docker-compose 裡的 service 名稱！
+        'HOST': '127.0.0.1',        # 🌟 這裡必須填你們 MySQL 在 docker-compose 裡的 service 名稱！
         'PORT': '3306',
     }
 }

@@ -13,10 +13,11 @@
         }
         
         body {
-            font-family: "Noto Sans TC", Arial, sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: #333;
-            min-height: 100vh;
+          font-family: "Noto Sans TC", Arial, sans-serif;
+          background: linear-gradient(135deg, rgba(30,60,114,0.6) 0%, rgba(42,82,152,0.6) 100%), url('https://photo.16pic.com/00/92/70/16pic_9270998_b.jpg') center/cover no-repeat;
+          color: #333;
+          min-height: 100vh;
+          background-attachment: fixed;
         }
         
         .page-shell {
@@ -51,18 +52,21 @@
         
         nav {
             background: rgba(0, 0, 0, 0.5);
-            padding: 0.5rem 2rem;
-            border-bottom: 1px solid #333;
+          padding: 0.5rem 2rem;
+          border-bottom: 1px solid #333;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 1rem;
         }
         
         nav a {
-            color: white;
-            text-decoration: none;
-            margin-right: 2rem;
-            padding: 0.5rem 1rem;
-            display: inline-block;
-            border-radius: 4px;
-            transition: background 0.3s;
+          color: white;
+          text-decoration: none;
+          padding: 0.5rem 1rem;
+          display: inline-block;
+          border-radius: 4px;
+          transition: background 0.3s;
         }
         
         nav a:hover {
@@ -193,12 +197,15 @@
             .site-title {
                 font-size: 1.5rem;
             }
-            
-            nav a {
-                margin-right: 1rem;
-                padding: 0.4rem 0.8rem;
-                font-size: 0.9rem;
-            }
+          nav {
+            justify-content: center;
+            gap: 0.6rem;
+          }
+          nav a {
+            margin: 0;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.9rem;
+          }
             
             main {
                 padding: 1rem;
@@ -226,24 +233,36 @@
             <h2 class="section-title">即時感測器數據</h2>
             <p style="color: white; margin-bottom: 1.5rem;">{{ message }}</p>
             
-            {% if latest_readings %}
-                <div class="sensor-grid">
+            <div class="data-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>感測器</th>
+                    <th>數值</th>
+                    <th>單位</th>
+                    <th>更新時間</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% if latest_readings %}
                     {% for sensor_id, reading in latest_readings.items %}
-                        <div class="sensor-card">
-                            <div class="sensor-name">{{ reading.name }}</div>
-                            <div class="sensor-value">{{ reading.value|floatformat:2 }}</div>
-                            <div class="sensor-unit">{{ reading.unit }}</div>
-                            <div class="sensor-topic">{{ reading.mqtt_topic }}</div>
-                            <div class="sensor-timestamp">更新時間: {{ reading.timestamp|date:"Y-m-d H:i:s" }}</div>
-                            <a href="{% url 'sensor_detail' sensor_id %}" class="view-button">查看詳情</a>
-                        </div>
+                      <tr>
+                        <td class="sensor-name">{{ reading.name }}</td>
+                        <td class="sensor-value">{{ reading.value|floatformat:2 }}</td>
+                        <td class="sensor-unit">{{ reading.unit }}</td>
+                        <td class="sensor-timestamp">{{ reading.timestamp|date:"Y-m-d H:i:s" }}</td>
+                        <td><a href="{% url 'sensor_detail' sensor_id %}" class="view-button">查看詳情</a></td>
+                      </tr>
                     {% endfor %}
-                </div>
-            {% else %}
-                <div class="no-data">
-                    <p>目前沒有感測器數據。請先配置MQTT感測器並啟動 mqtt_listener 服務。</p>
-                </div>
-            {% endif %}
+                  {% else %}
+                    <tr>
+                      <td colspan="5" style="text-align:center; color:#666; padding:1.2rem;">目前尚無感測器資料</td>
+                    </tr>
+                  {% endif %}
+                </tbody>
+              </table>
+            </div>
             
             {% if project_links %}
                 <div class="projects-section">
