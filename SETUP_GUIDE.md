@@ -153,7 +153,7 @@ GET /api/sensor/<sensor_id>/data/?days=<days>
 ## 技術棧
 
 - **後端框架**: Django 6.0.6
-- **數據庫**: SQLite3
+- **數據庫**: MySQL
 - **MQTT 客戶端**: paho-mqtt 1.6.1
 - **前端**: HTML5 + CSS3 + JavaScript
 - **圖表庫**: Chart.js
@@ -162,7 +162,7 @@ GET /api/sensor/<sensor_id>/data/?days=<days>
 
 - ✅ 實時感測器數據顯示
 - ✅ MQTT 主題自動發現和訂閱
-- ✅ 數據持久化到 SQLite 數據庫
+- ✅ 數據持久化到 MySQL 資料庫
 - ✅ 歷史數據折線圖表
 - ✅ 數據篩選和瀏覽
 - ✅ 響應式設計（桌面和移動設備）

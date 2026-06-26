@@ -10,7 +10,7 @@
 
 ✅ Django 動態網站服務
 ✅ MQTT 感測器數據實時讀取（支持 3+ 主題）
-✅ 數據持久化到 SQLite 數據庫
+✅ 數據持久化到 MySQL 資料庫
 ✅ 歷史數據折線圖表展示
 ✅ 原始數據瀏覽和篩選
 ✅ 組專題連結管理
@@ -236,9 +236,10 @@ curl http://localhost:8000/api/sensor/1/data/?days=1
 
 **解決方案**:
 ```bash
-# 重置數據庫
-rm db.sqlite3
-python manage.py migrate
+# 重置數據庫（MySQL）
+# 請在 MySQL 中刪除並重建專案對應的資料庫，或使用管理工具清空表，然後重新執行遷移：
+# 1. 在 MySQL 中 drop/create database
+# 2. python manage.py migrate
 
 # 重新創建管理員帳戶
 python manage.py createsuperuser
@@ -264,7 +265,7 @@ web/
 ├── utils.py              # 工具指令碼
 ├── mqtt_test_client.py   # MQTT 測試客戶端
 ├── SETUP_GUIDE.md        # 完整設置指南
-├── db.sqlite3            # 數據庫文件
+├── （使用 MySQL，資料庫設定在 mysite/settings.py）
 │
 ├── mysite/               # Django 項目設置
 │   ├── settings.py

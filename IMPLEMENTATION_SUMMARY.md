@@ -13,7 +13,7 @@
 | 3 | 組專題連結 | ✅ 完成 | ProjectLink 模型 + /projects/ 頁面 |
 | 4 | MQTT 數據讀取（3+主題） | ✅ 完成 | mqtt_listener 管理命令 |
 | 5 | 實時數據顯示 | ✅ 完成 | 首頁和儀表板實時更新 |
-| 6 | 數據庫存儲 | ✅ 完成 | SensorData 模型 + SQLite |
+| 6 | 數據庫存儲 | ✅ 完成 | SensorData 模型 + MySQL |
 | 7 | 歷史數據圖表 | ✅ 完成 | Chart.js 折線圖 |
 | 8 | 原始數據瀏覽 | ✅ 完成 | /raw-data/ 頁面 |
 
@@ -189,7 +189,7 @@ MQTT 消息解析 (支持多種格式)
     ↓
 SensorData 模型保存
     ↓
-SQLite 數據庫
+MySQL 資料庫
     ↓
 Django Views + API
     ↓
@@ -205,10 +205,10 @@ HTML 模板 + Chart.js
 - 內置管理後台
 - 豐富的生態和文檔
 
-### SQLite
-- 零配置數據庫
-- 開發環境無依賴
-- 適合中小型應用
+### MySQL
+- 穩定且可擴展的關聯式資料庫
+- 適合多用戶和生產環境部署
+- 支持備份、複寫與性能調校
 
 ### paho-mqtt
 - 純 Python 實現

@@ -2,7 +2,7 @@
 
 ## 📋 專案描述
 
-這是一個功能完整的 Django 個人網站，用於實時監測和可視化 IoT 感測器數據。網站通過 MQTT 協議讀取多個感測器的數據，儲存到本地 SQLite 數據庫，並提供實時顯示、圖表分析和原始數據瀏覽等功能。
+這是一個功能完整的 Django 個人網站，用於實時監測和可視化 IoT 感測器數據。網站通過 MQTT 協議讀取多個感測器的數據，並儲存到 MySQL 資料庫，提供實時顯示、圖表分析和原始數據瀏覽等功能。
 
 **開發者**: 廖烽均  
 **座號**: B11213032
@@ -35,7 +35,7 @@
 - ✅ **讀取的感測器資料要能夠儲存在自己的資料庫中**
   - SensorData 模型存儲每個讀數
   - 自動時間戳和感測器關聯
-  - SQLite 數據庫持久化存儲
+  - MySQL 資料庫持久化存儲
 
 - ✅ **讀取的感測器歷史資料要能以圖表的方式呈現在網站上**
   - Chart.js 折線圖表顯示歷史數據
@@ -118,7 +118,7 @@ web/
 ├── utils.py               # 工具腳本
 ├── mqtt_test_client.py    # MQTT 測試客戶端
 ├── manage.py              # Django 管理
-├── db.sqlite3             # SQLite 數據庫
+├── （使用 MySQL，資料庫設定在 mysite/settings.py）
 │
 ├── mysite/                # Django 項目配置
 │   ├── settings.py        # 設置
@@ -153,9 +153,8 @@ web/
 
 ## 🛠️ 技術堆棧
 
-### 後端
 - **框架**: Django 6.0.6
-- **數據庫**: SQLite3
+- **數據庫**: MySQL
 - **MQTT**: paho-mqtt 1.6.1
 - **Python**: 3.8+
 
@@ -338,7 +337,7 @@ A: 確認已添加感測器、mqtt_listener 正在運行、發送了 MQTT 消息
 A: 檢查網絡連接、確認有足夠的數據、查看瀏覽器控制台錯誤
 
 **Q: 數據庫錯誤**
-A: 運行 `python manage.py migrate`，如需重置運行 `rm db.sqlite3` 然後重新遷移
+A: 運行 `python manage.py migrate`。如需重置資料庫，請在 MySQL 中刪除並重建專案對應的資料庫，或清空表後重新執行遷移。
 
 詳見 [SETUP_GUIDE.md](SETUP_GUIDE.md#🐛-故障排除) 中的完整故障排除指南
 
